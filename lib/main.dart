@@ -172,7 +172,7 @@ class MyHomePage extends StatelessWidget {
                 const SizedBox(height: 32),
                 _buildTokenSection(context, appState),
                 const SizedBox(height: 24),
-                _buildUrlSection(context, app-State),
+                _buildUrlSection(context, appState),
                 const SizedBox(height: 32),
                 _buildTestFormSection(context, appState),
                 const SizedBox(height: 40),

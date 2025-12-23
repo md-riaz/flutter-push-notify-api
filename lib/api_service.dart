@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'dart:math';
 
 class ApiService {
@@ -15,7 +16,10 @@ class ApiService {
 
     // In a real implementation, you would log the fcmToken and deviceInfo
     // on your server, associating them with the generated apiKey.
-    print('Mock API: Registered FCM token $fcmToken for device $deviceInfo. API Key: $apiKey');
+    developer.log(
+      'Mock API: Registered FCM token $fcmToken for device $deviceInfo. API Key: $apiKey',
+      name: 'com.notifyhub.app',
+    );
 
     return apiKey;
   }

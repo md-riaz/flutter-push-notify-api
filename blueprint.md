@@ -13,6 +13,7 @@ This document outlines the project structure and features for **NotifyHub**, a m
     1.  The app retrieves the device-specific FCM token from Firebase.
     2.  It sends this FCM token along with mock device info to the `ApiService`.
     3.  The service returns a unique, randomly generated API key, mimicking a real-world authentication process.
+- **API Key Persistence:** The API key is persisted across app restarts using `shared_preferences`, ensuring a consistent user experience.
 - **API Key Management:** The app securely manages and displays the API key, which is used for sending notifications.
 - **Foreground & Background Notifications:** Handles incoming notifications seamlessly whether the app is active, in the background, or terminated.
 - **Notification Permissions:** Automatically requests the necessary user permissions for receiving notifications.
