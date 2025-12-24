@@ -41,18 +41,33 @@ class ApiService {
       );
 
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        if (data['success'] == true && data['api_key'] != null) {
+        try {
+          final data = jsonDecode(response.body);
+          if (data['success'] == true && data['api_key'] != null) {
+            developer.log(
+              'API: Successfully registered device. API Key: ${data['api_key']}',
+              name: 'com.notifyhub.app',
+            );
+            return data['api_key'];
+          }
+          throw Exception(data['error'] ?? 'Failed to get API key');
+        } on FormatException catch (e) {
           developer.log(
-            'API: Successfully registered device. API Key: ${data['api_key']}',
+            'API Error: Invalid JSON response - $e',
             name: 'com.notifyhub.app',
+            level: 900,
           );
-          return data['api_key'];
+          throw Exception('Invalid server response');
         }
-        throw Exception(data['error'] ?? 'Failed to get API key');
       } else {
-        final errorData = jsonDecode(response.body);
-        throw Exception(errorData['error'] ?? 'Server error: ${response.statusCode}');
+        String errorMessage = 'Server error: ${response.statusCode}';
+        try {
+          final errorData = jsonDecode(response.body);
+          errorMessage = errorData['error'] ?? errorMessage;
+        } on FormatException {
+          // Response is not JSON, use default error message
+        }
+        throw Exception(errorMessage);
       }
     } catch (e) {
       developer.log(
