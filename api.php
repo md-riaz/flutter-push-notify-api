@@ -35,9 +35,6 @@ define('SECRET_KEY', getenv('NOTIFYHUB_SECRET_KEY') ?: 'CHANGE_THIS_SECRET_KEY')
 // SECURITY: Place firebase-service-account.json outside web root or use .htaccess to block access
 define('FCM_SERVICE_ACCOUNT_PATH', getenv('FCM_SERVICE_ACCOUNT_JSON') ?: __DIR__ . '/firebase-service-account.json');
 define('SQLITE_DB_PATH', __DIR__ . '/notifyhub.db');
-// Set to true to require secret key for sending notifications (more secure)
-// Set to false to allow sending with just the API key (compatible with third-party integrations)
-define('REQUIRE_SECRET_FOR_SEND', false);
 
 // Prevent using default secret key in production
 if (SECRET_KEY === 'CHANGE_THIS_SECRET_KEY' && getenv('APP_ENV') === 'production') {
@@ -398,11 +395,6 @@ function handleRegister() {
  * Handle sending notification
  */
 function handleSendNotification() {
-    // Optionally require secret key for sending (configurable security)
-    if (REQUIRE_SECRET_FOR_SEND) {
-        validateSecretKey();
-    }
-    
     // Get parameters from various sources
     $input = json_decode(file_get_contents('php://input'), true) ?: [];
     
