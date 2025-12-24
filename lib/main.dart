@@ -136,6 +136,7 @@ class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -160,8 +161,8 @@ class MyHomePage extends StatelessWidget {
                   top: 8,
                   child: Container(
                     padding: const EdgeInsets.all(4),
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.error,
                       shape: BoxShape.circle,
                     ),
                     constraints: const BoxConstraints(
@@ -176,74 +177,60 @@ class MyHomePage extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                AppTheme.backgroundColor,
-                AppTheme.backgroundColor.withAlpha(204),
-                Colors.white,
-              ],
-            ),
-          ),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeaderSection(),
-                const SizedBox(height: 32),
-                _buildTokenSection(context, appState),
-                const SizedBox(height: 24),
-                _buildUrlSection(context, appState),
-                const SizedBox(height: 32),
-                _buildTestFormSection(context, appState),
-                const SizedBox(height: 40),
-              ],
-            ),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeaderSection(theme),
+              const SizedBox(height: 32),
+              _buildTokenSection(context, appState, theme),
+              const SizedBox(height: 24),
+              _buildUrlSection(context, appState, theme),
+              const SizedBox(height: 32),
+              _buildTestFormSection(context, appState, theme),
+              const SizedBox(height: 40),
+            ],
           ),
         ),
       ),
     );
   }
 
-  Widget _buildHeaderSection() {
+  Widget _buildHeaderSection(ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'Service Dashboard',
-          style: TextStyle(
-            color: Colors.grey.shade600,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
             letterSpacing: 1.2,
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
+        Text(
           'Push Notification API',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF0F172A),
+          style: theme.textTheme.displayLarge?.copyWith(
+            color: theme.colorScheme.onSurface,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildTokenSection(BuildContext context, AppState appState) {
+  Widget _buildTokenSection(BuildContext context, AppState appState, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 4, bottom: 12),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             'API KEY',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
         Card(
@@ -254,11 +241,10 @@ class MyHomePage extends StatelessWidget {
                 Expanded(
                   child: Text(
                     appState.apiKey ?? 'Generating key...',
-                    style: const TextStyle(
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       fontFamily: 'monospace',
-                      fontSize: 15,
                       fontWeight: FontWeight.w600,
-                      color: AppTheme.primaryColor,
+                      color: theme.colorScheme.primary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -273,12 +259,12 @@ class MyHomePage extends StatelessWidget {
                     }
                   },
                   icon: const Icon(Icons.copy_rounded, size: 20),
-                  color: AppTheme.primaryColor,
+                  color: theme.colorScheme.primary,
                 ),
                 IconButton(
                   onPressed: () => appState.refreshApiKey(),
                   icon: const Icon(Icons.refresh_rounded, size: 20),
-                  color: AppTheme.primaryColor,
+                  color: theme.colorScheme.primary,
                 ),
               ],
             ),
@@ -288,16 +274,19 @@ class MyHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildUrlSection(BuildContext context, AppState appState) {
+  Widget _buildUrlSection(BuildContext context, AppState appState, ThemeData theme) {
     final apiUrl = '${ApiConfig.baseUrl}?action=send&k=${appState.apiKey ?? 'YOUR_API_KEY'}&t=title&c=contents&u=url';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 4, bottom: 12),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             'API ENDPOINT',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
         Card(
@@ -306,22 +295,24 @@ class MyHomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Base URL',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
+                    color: theme.colorScheme.primary.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: SelectableText(
                     apiUrl,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Colors.blue.shade800,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: theme.colorScheme.primary,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -334,15 +325,18 @@ class MyHomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildTestFormSection(BuildContext context, AppState appState) {
+  Widget _buildTestFormSection(BuildContext context, AppState appState, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 4, bottom: 12),
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 12),
           child: Text(
             'TEST CONSOLE',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+            style: theme.textTheme.labelSmall?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: theme.colorScheme.onSurfaceVariant,
+            ),
           ),
         ),
         Card(
@@ -421,7 +415,6 @@ class MyHomePage extends StatelessWidget {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
                       : const Text('Send Test Push'),
@@ -435,14 +428,15 @@ class MyHomePage extends StatelessWidget {
   }
 
   void _showHowToUseDialog(BuildContext context) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.lightbulb_outline_rounded, color: AppTheme.primaryColor),
-            SizedBox(width: 12),
-            Text('Quick Start Guide'),
+            Icon(Icons.lightbulb_outline_rounded, color: theme.colorScheme.primary),
+            const SizedBox(width: 12),
+            const Text('Quick Start Guide'),
           ],
         ),
         content: const SingleChildScrollView(
@@ -486,6 +480,7 @@ class _GuideItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
@@ -494,12 +489,12 @@ class _GuideItem extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: AppTheme.primaryColor.withAlpha(26),
+              color: theme.colorScheme.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Text(
               step,
-              style: const TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
+              style: TextStyle(color: theme.colorScheme.primary, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(width: 16),
@@ -507,9 +502,9 @@ class _GuideItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(title, style: theme.textTheme.titleMedium),
                 const SizedBox(height: 4),
-                Text(desc, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+                Text(desc, style: theme.textTheme.bodySmall),
               ],
             ),
           ),
@@ -525,6 +520,7 @@ class HistoryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -545,11 +541,11 @@ class HistoryScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.notifications_off_outlined, size: 64, color: Colors.grey.shade300),
+                    Icon(Icons.notifications_off_outlined, size: 64, color: theme.colorScheme.onSurface.withOpacity(0.3)),
                     const SizedBox(height: 16),
                     Text(
                       'No notifications yet',
-                      style: TextStyle(color: Colors.grey.shade500, fontSize: 16),
+                      style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurface.withOpacity(0.5)),
                     ),
                   ],
                 ),
@@ -562,22 +558,17 @@ class HistoryScreen extends StatelessWidget {
                   final timestamp = DateTime.parse(item['timestamp']);
                   final formattedDate = DateFormat('MMM d, HH:mm').format(timestamp);
         
-                  return Container(
+                  return Card(
                     margin: const EdgeInsets.only(bottom: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade100),
-                    ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.all(16),
                       leading: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: AppTheme.primaryColor.withAlpha(26),
+                          color: theme.colorScheme.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Icon(Icons.notifications_active_rounded, color: AppTheme.primaryColor),
+                        child: Icon(Icons.notifications_active_rounded, color: theme.colorScheme.primary),
                       ),
                       title: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -585,13 +576,13 @@ class HistoryScreen extends StatelessWidget {
                           Expanded(
                             child: Text(
                               item['title'],
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                              style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           Text(
                             formattedDate,
-                            style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+                            style: theme.textTheme.bodySmall,
                           ),
                         ],
                       ),
@@ -601,26 +592,25 @@ class HistoryScreen extends StatelessWidget {
                           const SizedBox(height: 8),
                           Text(
                             item['body'],
-                            style: TextStyle(color: Colors.grey.shade700, height: 1.4),
+                            style: theme.textTheme.bodyMedium?.copyWith(height: 1.4),
                           ),
                           if (item['url'] != null && item['url'].toString().isNotEmpty) ...[
                             const SizedBox(height: 12),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade50,
+                                color: theme.colorScheme.secondary.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  const Icon(Icons.link_rounded, size: 14, color: AppTheme.secondaryColor),
+                                  Icon(Icons.link_rounded, size: 14, color: theme.colorScheme.secondary),
                                   const SizedBox(width: 4),
                                   Text(
                                     item['url'],
-                                    style: const TextStyle(
-                                      color: AppTheme.secondaryColor,
-                                      fontSize: 12,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: theme.colorScheme.secondary,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
