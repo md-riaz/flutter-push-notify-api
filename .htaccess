@@ -1,0 +1,17 @@
+# NotifyHub API Security Configuration
+# This file protects sensitive files from being accessed via HTTP
+
+# Protect Firebase service account JSON file
+<FilesMatch "firebase-service-account\.json$">
+    Require all denied
+</FilesMatch>
+
+# Protect SQLite database file
+<FilesMatch "\.db$">
+    Require all denied
+</FilesMatch>
+
+# Protect .htaccess itself
+<FilesMatch "^\.htaccess$">
+    Require all denied
+</FilesMatch>

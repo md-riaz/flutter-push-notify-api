@@ -5,13 +5,14 @@ import 'package:http/http.dart' as http;
 /// Configuration for the NotifyHub API
 class ApiConfig {
   /// The base URL of your NotifyHub REST API
-  /// Change this to your actual API URL
+  /// IMPORTANT: Change this to your actual API URL before deploying
   /// Note: Use HTTPS in production for secure communication
-  static const String baseUrl = 'https://your-server.com/api.php';
+  static const String baseUrl = 'https://your-domain.com/api.php';
 
   /// Secret key for authentication between the app and API
+  /// IMPORTANT: Change this to a strong, unique secret key before deploying
   /// This should match the SECRET_KEY in your PHP api.php
-  static const String secretKey = 'your-secret-key-here';
+  static const String secretKey = 'CHANGE_THIS_SECRET_KEY';
 }
 
 class ApiService {

@@ -55,14 +55,21 @@ The `api.php` file in the root directory provides a REST API for device registra
    - Go to Firebase Console > Project Settings > Service Accounts
    - Generate a new private key and download the JSON file
    - Save it as `firebase-service-account.json` in the same directory as `api.php`
+   - **Security:** The included `.htaccess` file blocks HTTP access to this file on Apache servers
 
 2. **Configure Secret Key:**
+   - **IMPORTANT:** Change the default secret key before deploying!
    - Set the `NOTIFYHUB_SECRET_KEY` environment variable, or
    - Edit the `SECRET_KEY` constant in `api.php`
    - Update `ApiConfig.secretKey` in `lib/api_service.dart` to match
 
 3. **Configure API URL:**
    - Update `ApiConfig.baseUrl` in `lib/api_service.dart` to point to your server
+
+4. **Production Security:**
+   - Set `APP_ENV=production` environment variable to enable default key detection
+   - Use HTTPS for all API communication
+   - The `.htaccess` file protects sensitive files on Apache servers
 
 ### API Endpoints
 
