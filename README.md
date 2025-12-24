@@ -1,16 +1,18 @@
 # NotifyHub - Firebase Cloud Messaging Push Notification App
 
-NotifyHub is a modern and comprehensive Flutter application designed to serve as a powerful tool for testing and demonstrating Firebase Cloud Messaging (FCM) push notifications. This app provides a user-friendly dashboard to manage and simulate push notifications through a mocked third-party API, offering a complete and intuitive testing cycle from API key generation to notification history tracking.
+NotifyHub is a modern and comprehensive Flutter application designed to serve as a powerful tool for testing and demonstrating Firebase Cloud Messaging (FCM) push notifications. This app provides a user-friendly dashboard to manage and simulate push notifications through a REST API, offering a complete and intuitive testing cycle from API key generation to notification history tracking.
 
 ## Features
 
 - **FCM Integration:** Fully integrated with Firebase Cloud Messaging for robust and reliable notification handling.
-- **Mock Third-Party API:** Includes a mock `ApiService` that simulates fetching a unique API key, mirroring a real-world authentication process where a device-specific FCM token is exchanged for an API key.
+- **REST API Backend:** Includes a PHP REST API (`api.php`) that handles device registration and FCM notification sending using Firebase Admin SDK.
+- **SQLite Database:** Device registrations and API keys are stored in a SQLite database for persistence.
+- **Secret Key Authentication:** Secure communication between the app and API using a shared secret key.
 - **API Key Persistence:** The API key is persisted across app restarts using `shared_preferences`, providing a consistent and seamless user experience.
 - **API Key Management:** The app securely manages and displays the API key, which can be easily copied to the clipboard or refreshed with a single tap.
 - **Foreground & Background Notifications:** Handles incoming notifications seamlessly, whether the app is in the foreground, background, or terminated.
 - **Notification Permissions:** Automatically requests the necessary user permissions for receiving notifications, ensuring a smooth user experience.
-- **Test Console:** A built-in form allows you to simulate sending a test push notification to the device itself, making it easy to test your notification setup.
+- **Test Console:** A built-in form allows you to send a real push notification to the device via the REST API.
 - **Notification History:** All received notifications are stored locally using `shared_preferences` and displayed in a clean, chronological list, allowing you to review past notifications at any time.
 
 ## Getting Started
@@ -36,6 +38,68 @@ To get started with NotifyHub, you'll need to have Flutter and the Firebase CLI 
     ```bash
     flutter run
     ```
+
+## REST API Setup
+
+The `api.php` file in the root directory provides a REST API for device registration and FCM notification sending.
+
+### Requirements
+
+- PHP 7.4+ with PDO SQLite extension
+- cURL extension for PHP
+- Firebase service account JSON file
+
+### Configuration
+
+1. **Set up Firebase Service Account:**
+   - Go to Firebase Console > Project Settings > Service Accounts
+   - Generate a new private key and download the JSON file
+   - Save it as `firebase-service-account.json` in the same directory as `api.php`
+
+2. **Configure Secret Key:**
+   - Set the `NOTIFYHUB_SECRET_KEY` environment variable, or
+   - Edit the `SECRET_KEY` constant in `api.php`
+   - Update `ApiConfig.secretKey` in `lib/api_service.dart` to match
+
+3. **Configure API URL:**
+   - Update `ApiConfig.baseUrl` in `lib/api_service.dart` to point to your server
+
+### API Endpoints
+
+#### Register Device
+```
+POST /api.php?action=register
+Headers:
+  Content-Type: application/json
+  X-Secret-Key: your-secret-key-here
+Body:
+  {
+    "fcm_token": "device-fcm-token",
+    "device_info": "Flutter App v1.0"
+  }
+Response:
+  {
+    "success": true,
+    "api_key": "API-XXXXXXXXXXXX",
+    "message": "Device registered successfully"
+  }
+```
+
+#### Send Notification
+```
+GET /api.php?action=send&k=API_KEY&t=Title&c=Content&u=URL
+Parameters:
+  k - API key (required)
+  t - Notification title (required)
+  c - Notification content (required)
+  u - Deep link URL (optional)
+Response:
+  {
+    "success": true,
+    "message": "Notification sent successfully",
+    "message_id": "projects/xxx/messages/xxx"
+  }
+```
 
 ## Usage
 

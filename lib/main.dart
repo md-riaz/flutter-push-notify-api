@@ -45,6 +45,8 @@ class AppState with ChangeNotifier {
   String? _fcmToken;
   String? _apiKey;
   String? get apiKey => _apiKey;
+  bool _isSending = false;
+  bool get isSending => _isSending;
 
   final TextEditingController titleController = TextEditingController(text: 'Hello World');
   final TextEditingController contentController = TextEditingController(text: 'Push notification test content');
@@ -88,6 +90,29 @@ class AppState with ChangeNotifier {
 
   void refreshApiKey() {
     _initServices(forceRefresh: true);
+  }
+
+  /// Send a test push notification via the REST API
+  Future<Map<String, dynamic>> sendTestNotification() async {
+    if (_apiKey == null) {
+      return {'success': false, 'error': 'API key not available'};
+    }
+
+    _isSending = true;
+    notifyListeners();
+
+    try {
+      final result = await _apiService.sendNotification(
+        apiKey: _apiKey!,
+        title: titleController.text,
+        content: contentController.text,
+        url: urlController.text,
+      );
+      return result;
+    } finally {
+      _isSending = false;
+      notifyListeners();
+    }
   }
 
   Future<void> _loadHistory() async {
@@ -264,7 +289,7 @@ class MyHomePage extends StatelessWidget {
   }
 
   Widget _buildUrlSection(BuildContext context, AppState appState) {
-    final apiUrl = 'http://xdroid.net/api/message?k=${appState.apiKey ?? 'YOUR_API_KEY'}&t=title&c=contents&u=url';
+    final apiUrl = '${ApiConfig.baseUrl}?action=send&k=${appState.apiKey ?? 'YOUR_API_KEY'}&t=title&c=contents&u=url';
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -352,23 +377,54 @@ class MyHomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.green.shade600,
-                        content: const Row(
-                          children: [
-                            Icon(Icons.check_circle_outline, color: Colors.white),
-                            SizedBox(width: 12),
-                            Text('Test simulation sent successfully'),
-                          ],
-                        ),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      ),
-                    );
-                  },
-                  child: const Text('Send Test Push'),
+                  onPressed: appState.isSending || appState.apiKey == null
+                      ? null
+                      : () async {
+                          final result = await appState.sendTestNotification();
+                          if (!context.mounted) return;
+                          
+                          if (result['success'] == true) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.green.shade600,
+                                content: const Row(
+                                  children: [
+                                    Icon(Icons.check_circle_outline, color: Colors.white),
+                                    SizedBox(width: 12),
+                                    Expanded(child: Text('Push notification sent successfully!')),
+                                  ],
+                                ),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: Colors.red.shade600,
+                                content: Row(
+                                  children: [
+                                    const Icon(Icons.error_outline, color: Colors.white),
+                                    const SizedBox(width: 12),
+                                    Expanded(child: Text(result['error'] ?? 'Failed to send notification')),
+                                  ],
+                                ),
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                            );
+                          }
+                        },
+                  child: appState.isSending
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : const Text('Send Test Push'),
                 ),
               ],
             ),
